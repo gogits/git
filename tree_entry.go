@@ -59,13 +59,13 @@ type TreeEntry struct {
 
 	ptree *Tree
 
-//	commit   *Commit
+	//	commit   *Commit
 	commited bool
 
 	size  int64
 	sized bool
 
-//	modTime time.Time
+	//	modTime time.Time
 }
 
 func (te *TreeEntry) Name() string {

@@ -187,7 +187,7 @@ func readObjectBytes(path string, indexfiles *map[string]*idxFile, offset uint64
 		num := int64(buf[pos]) & 0x7f
 		for buf[pos]&0x80 > 0 {
 			pos = pos + 1
-			num = ((num + 1) << 7) | int64(buf[pos]&0x7f)
+			num = (num+1)<<7 | int64(buf[pos]&0x7f)
 		}
 		baseObjectOffset = uint64(offsetInt - num)
 		pos = pos + 1
