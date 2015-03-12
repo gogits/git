@@ -98,14 +98,22 @@ func filepathFromSHA1(rootdir, sha1 string) string {
 // lowest four bits, and if bit 7 is set, it means 'more' bytes
 // will follow. These are added to the »left side« of the length
 func readLenInPackFile(buf []byte) (length int, advance int) {
-	advance = 0
-	shift := [...]byte{0, 4, 11, 18, 25, 32, 39, 46, 53, 60}
-	length = int(buf[advance] & 0x0F)
-	for buf[advance]&0x80 > 0 {
-		advance += 1
-		length += (int(buf[advance]&0x7F) << shift[advance])
+	if len(buf) == 0 {
+		return -1, 0
 	}
-	advance++
+
+	i := 0
+	c := buf[i]
+	length = int(c & 0x0f)
+
+	for shift := uint(4); c&0x80 > 0; shift += 7 {
+		i++
+		c = buf[i]
+
+		length |= int(c&0x7F) << shift
+	}
+	advance = i + 1
+
 	return
 }
 
@@ -253,22 +261,19 @@ func readObjectBytes(path string, indexfiles *map[string]*idxFile, offset uint64
 // Return length as integer from zero terminated string
 // and the beginning of the real object
 func getLengthZeroTerminated(b []byte) (int64, int64) {
-	i := 0
-	var pos int
-	for b[i] != 0 {
-		i++
+	var (
+		length int64
+	)
+
+	for i, b := range b {
+		if b == 0 {
+			return length, int64(i + 1)
+		}
+
+		length = length*10 + int64(b-48)
 	}
-	pos = i
-	i--
-	var length int64
-	var pow int64
-	pow = 1
-	for i >= 0 {
-		length = length + (int64(b[i])-48)*pow
-		pow = pow * 10
-		i--
-	}
-	return length, int64(pos) + 1
+
+	panic("not zero terminated")
 }
 
 // Read the contents of the object file at path.
