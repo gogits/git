@@ -244,10 +244,10 @@ func readObjectBytes(path string, indexfiles *map[string]*idxFile, offset uint64
 	resultObjectLength, bytesRead := readerLittleEndianBase128Number(rc)
 	zpos += bytesRead
 
+	length = resultObjectLength
 	if sizeonly {
 		// if we are only interested in the size of the object,
 		// we don't need to do more expensive stuff
-		length = resultObjectLength
 		return
 	}
 
