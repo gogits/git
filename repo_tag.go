@@ -47,6 +47,15 @@ func (repo *Repository) GetTag(tagName string) (*Tag, error) {
 	return tag, nil
 }
 
+func (repo *Repository) GetTagWithId(hash string) (*Tag, error) {
+	id, err := NewIdFromString(hash)
+	if err != nil {
+		return nil, err
+	}
+
+	return repo.getTag(id)
+}
+
 func (repo *Repository) getTag(id sha1) (*Tag, error) {
 	if repo.tagCache != nil {
 		if c, ok := repo.tagCache[id]; ok {
