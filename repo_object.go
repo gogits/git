@@ -30,6 +30,26 @@ func (t ObjectType) String() string {
 	}
 }
 
+type ObjectNotFoundError string
+
+func (err ObjectNotFoundError) Error() string {
+	return fmt.Sprintf("Object not found %s", string(err))
+}
+
+func IsObjectNotFound(err error) bool {
+	_, ok := err.(ObjectNotFoundError)
+	return err != nil && ok
+}
+
+func (repo *Repository) GetRawObject(hash string, metaOnly bool) (ObjectType, int64, io.ReadCloser, error) {
+	id, err := NewIdFromString(hash)
+	if err != nil {
+		return 0, 0, nil, err
+	}
+
+	return repo.getRawObject(id, metaOnly)
+}
+
 func (repo *Repository) getRawObject(id sha1, metaOnly bool) (ObjectType, int64, io.ReadCloser, error) {
 	// first we need to find out where the commit is stored
 	sha1 := id.String()
@@ -42,7 +62,7 @@ func (repo *Repository) getRawObject(id sha1, metaOnly bool) (ObjectType, int64,
 				return readObjectBytes(indexfile.packpath, &repo.indexfiles, offset, metaOnly)
 			}
 		}
-		return 0, 0, nil, errors.New(fmt.Sprintf("Object not found %s", sha1))
+		return 0, 0, nil, ObjectNotFoundError(sha1)
 	}
 	return readObjectFile(objpath, metaOnly)
 }
