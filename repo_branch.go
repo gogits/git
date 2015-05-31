@@ -26,6 +26,10 @@ func (repo *Repository) GetBranches() ([]string, error) {
 	return repo.readRefDir("refs/heads", "")
 }
 
+func (repo *Repository) GetRefs() ([]string, error) {
+	return repo.readRefDir("refs", "")
+}
+
 func (repo *Repository) CreateBranch(branchName, idStr string) error {
 	return repo.createRef("heads", branchName, idStr)
 }
