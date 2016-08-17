@@ -303,8 +303,8 @@ func readObjectFile(path string, sizeonly bool) (ot ObjectType, length int64, da
 	firstBufferSize := int64(1024)
 
 	buf := make([]byte, firstBufferSize)
-	_, err = r.Read(buf)
-	if err != nil {
+	nBytes, err := r.Read(buf)
+	if nBytes == 0 {
 		return
 	}
 
