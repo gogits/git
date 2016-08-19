@@ -139,7 +139,7 @@ func readerApplyDelta(br io.ReaderAt, dr io.Reader, resultLen int64) (res []byte
 		n, err = r.Read(buf)
 		if err == io.EOF {
 			err = nil
-			return
+			return n == 1
 		}
 		if n == 0 || err != nil {
 			return
@@ -153,7 +153,7 @@ func readerApplyDelta(br io.ReaderAt, dr io.Reader, resultLen int64) (res []byte
 		n, err = r.ReadAt(buf, off)
 		if err == io.EOF {
 			err = nil
-			return
+			return n == 1
 		}
 		if n == 0 || err != nil {
 			return
