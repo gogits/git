@@ -13,6 +13,13 @@ type Signature struct {
 	When  time.Time
 }
 
+// Outputs the author signature in the same format as git log:
+// "Author <email>". If needed, the "When" must be manually added to the
+// string.
+func (s Signature) String() string {
+	return s.Name + " <" + s.Email + ">"
+}
+
 // Helper to get a signature from the commit line, which looks like this:
 //     author Patrick Gundlach <gundlach@speedata.de> 1378823654 +0200
 // but without the "author " at the beginning (this method should)
