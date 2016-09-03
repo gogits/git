@@ -225,6 +225,10 @@ func (repo *Repository) CommitsBetween(last *Commit, before *Commit) (*list.List
 	return l, nil
 }
 
+// CommitsBefore returns a list of all commits before commitId and *also*
+// includes the *Commit representing commitId in the list.
+//
+// The (list.Element).Value of the list returned if of type *Commit.
 func (repo *Repository) CommitsBefore(commitId string) (*list.List, error) {
 	id, err := NewIdFromString(commitId)
 	if err != nil {
