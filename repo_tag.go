@@ -17,7 +17,21 @@ func (repo *Repository) TagPath(tagName string) string {
 
 // GetTags returns all tags of given repository.
 func (repo *Repository) GetTags() ([]string, error) {
-	return repo.readRefDir("refs/tags", "")
+	loose, err := repo.readRefDir("refs/tags", "")
+	if err != nil {
+		return nil, err
+	}
+
+	packed, err := repo.readPackedRefs()
+	if err != nil {
+		return nil, err
+	}
+
+	// Assumption: If both loose refs and packed refs exist then it's highly
+	//			   likely that the loose refs are more recent than packed (created
+	//			   on top of packed older refs). Therefore we can append each
+	//			   together taking the packed refs first.
+	return append(packed, loose...), nil
 }
 
 func (repo *Repository) CreateTag(tagName, idStr string) error {
