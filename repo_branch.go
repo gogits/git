@@ -1,10 +1,13 @@
 package git
 
 import (
+	"bytes"
 	"errors"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -50,6 +53,30 @@ func (repo *Repository) createRef(head, branchName, idStr string) error {
 
 	_, err = io.WriteString(f, id.String())
 	return err
+}
+
+func (repo *Repository) readPackedRefs() ([]string, error) {
+	path := repo.Path + "/packed-refs"
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil, nil
+	}
+
+	refData, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	re := regexp.MustCompile("v\\d+\\.\\d+\\.\\d+$")
+	names := []string{}
+
+	for _, ref := range bytes.Split(refData, []byte("\n")) {
+		if tag := re.Find(ref); tag != nil {
+			names = append(names, string(tag))
+		}
+	}
+
+	return names, nil
 }
 
 func (repo *Repository) readRefDir(prefix, relPath string) ([]string, error) {
